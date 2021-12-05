@@ -45,6 +45,8 @@ class QueryFactory
     {
         if (static::checkQueryClass($query)) {
             static::$map[$scheme] = $query;
+
+            return;
         }
 
         throw new RuntimeException('Invalid Query class!');
