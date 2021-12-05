@@ -32,7 +32,8 @@ interface QueryInterface
     // public function fetchGenerator(): Generator;
 
     /**
-     * @return bool
+     * @param array|null $params
+     * @return int
      */
-    public function execute(): bool;
+    public function execute(?array $params = null): int;
 }
