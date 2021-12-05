@@ -2,18 +2,20 @@
 
 namespace Zheltikov\Db;
 
+use RuntimeException;
+
 /**
  *
  */
 class PoolConfig
 {
     /**
-     * @var array<string, mixed>
+     * @var array<string, \Zheltikov\Db\Config>
      */
     protected array $configs;
 
     /**
-     * @param array<string, mixed> $configs
+     * @param array<string, \Zheltikov\Db\Config> $configs
      */
     public function __construct(array $configs = [])
     {
@@ -22,19 +24,19 @@ class PoolConfig
 
     /**
      * @param string $name
-     * @return mixed
+     * @return \Zheltikov\Db\Config
      */
-    public function get(string $name)
+    public function get(string $name): Config
     {
         if (!$this->has($name)) {
-            // throw
+            throw new RuntimeException('Config not found!');
         }
 
         return $this->configs[$name];
     }
 
     /**
-     * @param array<string, mixed> $configs
+     * @param array<string, \Zheltikov\Db\Config> $configs
      * @return $this
      */
     public function setConfigs(array $configs = []): self
@@ -50,10 +52,10 @@ class PoolConfig
 
     /**
      * @param string $name
-     * @param mixed $config
+     * @param \Zheltikov\Db\Config $config
      * @return $this
      */
-    public function set(string $name, $config): self
+    public function set(string $name, Config $config): self
     {
         $this->configs[$name] = $config;
 
