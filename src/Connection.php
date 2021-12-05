@@ -3,6 +3,7 @@
 namespace Zheltikov\Db;
 
 use PDO;
+use RuntimeException;
 
 /**
  *
@@ -10,44 +11,85 @@ use PDO;
 class Connection
 {
     /**
-     * @var mixed|null
+     * @var \Zheltikov\Db\Config
      */
-    protected $config = null;
+    protected Config $config;
 
     /**
-     * @var \PDO
+     * @var \PDO|null
      */
-    protected PDO $pdo;
+    protected ?PDO $pdo = null;
 
     /**
-     * @param mixed|null $config
+     * @var \Zheltikov\Db\QueryInterface|null
      */
-    public function __construct($config = null)
+    protected ?QueryInterface $query = null;
+
+    // -------------------------------------------------------------------------
+
+    /**
+     * @param \Zheltikov\Db\Config $config
+     */
+    public function __construct(Config $config)
     {
         $this->setConfig($config);
     }
 
     /**
-     * @param mixed|null $config
-     * @return $this
+     * @return bool
      */
-    public function setConfig($config = null): self
-    {
-        $this->config = $config;
-
-        return $this;
-    }
-
     public function open(): bool
     {
-        // TODO
-        return false;
+        if ($this->pdo !== null) {
+            if ($this->getConfig()->getDsn() === '') {
+                throw new RuntimeException('DSN is required!');
+            }
+
+            $this->pdo = new PDO(
+                $this->getConfig()->getDsn(),
+                $this->getConfig()->getUsername(),
+                $this->getConfig()->getPassword(),
+                $this->getConfig()->getOptions()
+            );
+        }
+
+        return true;
     }
 
+    /**
+     * @return bool
+     */
     public function close(): bool
     {
-        // TODO
-        return false;
+        $this->pdo = null;
+        $this->query = null;
+
+        return true;
+    }
+
+    // -------------------------------------------------------------------------
+
+    /**
+     * @return \PDO
+     */
+    public function getPdo(): PDO
+    {
+        if (
+            $this->pdo === null
+            && $this->open() === false
+        ) {
+            throw new RuntimeException('Could not open connection!');
+        }
+
+        return $this->pdo;
+    }
+
+    /**
+     * @return \Zheltikov\Db\Config
+     */
+    public function getConfig(): Config
+    {
+        return $this->config;
     }
 
     /**
@@ -55,7 +97,15 @@ class Connection
      */
     public function getQuery(): QueryInterface
     {
-        return QueryFactory::get($this);
+        if ($this->query === null) {
+            if ($this->open() === false) {
+                throw new RuntimeException('Could not open connection!');
+            }
+            
+            $this->query = QueryFactory::get($this);
+        }
+
+        return $this->query;
     }
 
     /**
@@ -63,8 +113,22 @@ class Connection
      */
     public function getScheme(): string
     {
-        // TODO
-        return 'unknown';
+        return $this->getConfig()->getScheme();
+    }
+
+    /**
+     * @param \Zheltikov\Db\Config $config
+     * @return $this
+     */
+    public function setConfig(Config $config): self
+    {
+        if ($this->close() === false) {
+            throw new RuntimeException('Could not close connection!');
+        }
+
+        $this->config = $config;
+
+        return $this;
     }
 }
 
