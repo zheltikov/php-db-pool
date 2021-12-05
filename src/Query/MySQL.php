@@ -3,6 +3,7 @@
 namespace Zheltikov\Db\Query;
 
 use Exception;
+use Generator;
 use PDO;
 use PDOStatement;
 use Zheltikov\Db\Connection;
@@ -74,8 +75,31 @@ class MySQL implements QueryInterface
 
         $result = $this->getStatement()->fetchAll(PDO::FETCH_ASSOC);
         $this->getStatement()->closeCursor();
-        
+
         return $result;
+    }
+
+    /**
+     * @return \Generator
+     * @throws \Exception
+     */
+    public function fetchGenerator(): Generator
+    {
+        $this->prepare();
+
+        $params = $this->getParams() ?: null;
+        $result = $this->getStatement()->execute($params);
+
+        if ($result === false) {
+            [$sqlstate, $code, $message] = $this->getStatement()->errorInfo();
+            throw new Exception($message ?: $sqlstate, $code);
+        }
+
+        while ($row = $this->getStatement()->fetch(PDO::FETCH_ASSOC)) {
+            yield $row;
+        }
+        
+        $this->getStatement()->closeCursor();
     }
 
     /**

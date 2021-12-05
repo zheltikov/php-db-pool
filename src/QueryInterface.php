@@ -2,6 +2,8 @@
 
 namespace Zheltikov\Db;
 
+use Generator;
+
 /**
  *
  */
@@ -29,7 +31,10 @@ interface QueryInterface
      */
     public function fetch(): array;
 
-    // public function fetchGenerator(): Generator;
+    /**
+     * @return \Generator
+     */
+    public function fetchGenerator(): Generator;
 
     /**
      * @param array|null $params
