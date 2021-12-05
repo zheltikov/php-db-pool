@@ -71,4 +71,3 @@ class PoolConfig
         return array_key_exists($name, $this->configs);
     }
 }
-
