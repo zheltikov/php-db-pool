@@ -35,12 +35,17 @@ function config(array $c = []): Config
     return $config;
 }
 
-function fetch(Pool $pool, string $name, string $sql, array $params): array
+/**
+ * @param array $c
+ * @return \Zheltikov\Db\PoolConfig
+ */
+function poolConfig(array $c = []): PoolConfig
 {
-    return $pool->getConnection($name)
-        ->getQuery()
-        ->setSql($sql)
-        ->setParams($params)
-        ->fetch();
-}
+    $poolConfig = new PoolConfig();
 
+    foreach ($c as $name => $config) {
+        $poolConfig->set($name, config($config));
+    }
+
+    return $poolConfig;
+}
