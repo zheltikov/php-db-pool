@@ -93,16 +93,21 @@ class Connection
     }
 
     /**
+     * @param bool $reset
      * @return \Zheltikov\Db\QueryInterface
      */
-    public function getQuery(): QueryInterface
+    public function getQuery(bool $reset = true): QueryInterface
     {
         if ($this->query === null) {
             if ($this->open() === false) {
                 throw new RuntimeException('Could not open connection!');
             }
-            
+
             $this->query = QueryFactory::get($this);
+        }
+
+        if ($reset) {
+            return $this->query->reset();
         }
 
         return $this->query;
