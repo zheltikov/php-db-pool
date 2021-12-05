@@ -3,6 +3,7 @@
 namespace Zheltikov\Db\Query;
 
 use Exception;
+use PDO;
 use PDOStatement;
 use Zheltikov\Db\Connection;
 use Zheltikov\Db\QueryInterface;
@@ -57,11 +58,24 @@ class MySQL implements QueryInterface
 
     /**
      * @return array
+     * @throws \Exception
      */
     public function fetch(): array
     {
-        // TODO: Implement fetch() method.
-        return [];
+        $this->prepare();
+
+        $params = $this->getParams() ?: null;
+        $result = $this->getStatement()->execute($params);
+
+        if ($result === false) {
+            [$sqlstate, $code, $message] = $this->getStatement()->errorInfo();
+            throw new Exception($message ?: $sqlstate, $code);
+        }
+
+        $result = $this->getStatement()->fetchAll(PDO::FETCH_ASSOC);
+        $this->getStatement()->closeCursor();
+        
+        return $result;
     }
 
     /**
