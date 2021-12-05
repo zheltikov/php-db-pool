@@ -2,8 +2,9 @@
 
 namespace Zheltikov\Db;
 
-use Zheltikov\Db\Query\{MySQL, PostgreSQL,};
 use RuntimeException;
+use Zheltikov\Db\Query\MySQL;
+use Zheltikov\Db\Query\PostgreSQL;
 
 /**
  *
