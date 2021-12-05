@@ -49,7 +49,7 @@ class Connection
                 $this->getConfig()->getDsn(),
                 $this->getConfig()->getUsername(),
                 $this->getConfig()->getPassword(),
-                $this->getConfig()->getOptions()
+                $this->getAttributes()
             );
         }
 
@@ -134,6 +134,52 @@ class Connection
         $this->config = $config;
 
         return $this;
+    }
+
+    /**
+     * @param int $attribute
+     * @param mixed $value
+     * @return $this
+     */
+    public function setAttribute(int $attribute, $value): self
+    {
+        if ($this->pdo !== null) {
+            $this->getPdo()->setAttribute($attribute, $value);
+        } else {
+            $this->getConfig()->setOption($attribute, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $attributes
+     * @return $this
+     */
+    public function setAttributes(array $attributes): self
+    {
+        foreach ($attributes as $attribute => $value) {
+            $this->setAttribute($attribute, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int $attribute
+     * @return mixed
+     */
+    public function getAttribute(int $attribute)
+    {
+        return $this->getPdo()->getAttribute($attribute);
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getAttributes(): ?array
+    {
+        return $this->getConfig()->getOptions();
     }
 }
 

@@ -146,4 +146,20 @@ class Config
         $this->options = $options;
         return $this;
     }
+
+    /**
+     * @param array-key $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setOption($key, $value): self
+    {
+        if ($this->getOptions() === null) {
+            return $this->setOptions([$key => $value]);
+        }
+
+        $this->options[$key] = $value;
+
+        return $this;
+    }
 }
